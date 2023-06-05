@@ -2,18 +2,22 @@ use nohash_hasher::BuildNoHashHasher;
 use rand::prelude::*;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
+use std::collections::HashSet;
 use std::hash::BuildHasherDefault;
 
-pub fn insert_std_hashset(size: usize) {
+pub fn insert_std_hashset(size: usize) -> std::collections::HashSet<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut h = std::collections::HashSet::new();
     for _ in 0..size {
         h.insert(rng.sample(u));
     }
+    h
 }
 
-pub fn insert_std_hashset_nohash(size: usize) {
+pub fn insert_std_hashset_nohash(
+    size: usize,
+) -> std::collections::HashSet<usize, BuildNoHashHasher<usize>> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut h: std::collections::HashSet<usize, BuildNoHashHasher<usize>> =
@@ -21,6 +25,7 @@ pub fn insert_std_hashset_nohash(size: usize) {
     for _ in 0..size {
         h.insert(rng.sample(u));
     }
+    h
 }
 
 // NOTE: this need actual testing.
@@ -60,7 +65,7 @@ pub fn deduplicate_slice_using_unsafe<T: Eq + Copy>(s: &mut [T]) -> usize {
     rv
 }
 
-pub fn push_sort_dedup_via_slice(size: usize) {
+pub fn push_sort_dedup_via_slice(size: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut v = vec![];
@@ -70,10 +75,10 @@ pub fn push_sort_dedup_via_slice(size: usize) {
     v.sort_unstable();
     let truncation = deduplicate_slice(&mut v);
     v.truncate(truncation);
-    assert!(v.windows(2).all(|w| w[0] <= w[1]));
+    v
 }
 
-pub fn push_sort_dedup_via_slice_using_unsafe(size: usize) {
+pub fn push_sort_dedup_via_slice_using_unsafe(size: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut v = vec![];
@@ -83,10 +88,10 @@ pub fn push_sort_dedup_via_slice_using_unsafe(size: usize) {
     v.sort_unstable();
     let truncation = deduplicate_slice_using_unsafe(&mut v);
     v.truncate(truncation);
-    assert!(v.windows(2).all(|w| w[0] <= w[1]));
+    v
 }
 
-pub fn push_sort_dedup(size: usize) {
+pub fn push_sort_dedup(size: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut v = vec![];
@@ -95,9 +100,10 @@ pub fn push_sort_dedup(size: usize) {
     }
     v.sort_unstable();
     v.dedup();
+    v
 }
 
-pub fn push_search_rotate(size: usize) {
+pub fn push_search_rotate(size: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut v: Vec<usize> = vec![];
@@ -111,9 +117,10 @@ pub fn push_search_rotate(size: usize) {
             }
         }
     }
+    v
 }
 
-pub fn push_linear_search_sort(size: usize) {
+pub fn push_linear_search_sort(size: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, usize::MAX);
     let mut v: Vec<usize> = vec![];
@@ -124,9 +131,10 @@ pub fn push_linear_search_sort(size: usize) {
         }
     }
     v.sort_unstable();
+    v
 }
 
-pub fn realistic_push_sort_dedup(nparents: usize, nsamples: usize) {
+pub fn realistic_push_sort_dedup(nparents: usize, nsamples: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, nparents);
     let mut rv = vec![];
@@ -135,9 +143,10 @@ pub fn realistic_push_sort_dedup(nparents: usize, nsamples: usize) {
     }
     rv.sort_unstable();
     rv.dedup();
+    rv
 }
 
-pub fn realistic_push_sort_dedup_by_slice(nparents: usize, nsamples: usize) {
+pub fn realistic_push_sort_dedup_by_slice(nparents: usize, nsamples: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, nparents);
     let mut rv = vec![];
@@ -147,9 +156,13 @@ pub fn realistic_push_sort_dedup_by_slice(nparents: usize, nsamples: usize) {
     rv.sort_unstable();
     let t = deduplicate_slice(&mut rv);
     rv.truncate(t);
+    rv
 }
 
-pub fn realistic_push_sort_dedup_by_slice_using_unsafe(nparents: usize, nsamples: usize) {
+pub fn realistic_push_sort_dedup_by_slice_using_unsafe(
+    nparents: usize,
+    nsamples: usize,
+) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, nparents);
     let mut rv = vec![];
@@ -159,9 +172,10 @@ pub fn realistic_push_sort_dedup_by_slice_using_unsafe(nparents: usize, nsamples
     rv.sort_unstable();
     let t = deduplicate_slice_using_unsafe(&mut rv);
     rv.truncate(t);
+    rv
 }
 
-pub fn realistic_push_linear_search(nparents: usize, nsamples: usize) {
+pub fn realistic_push_linear_search(nparents: usize, nsamples: usize) -> Vec<usize> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, nparents);
     let mut rv = vec![];
@@ -172,9 +186,13 @@ pub fn realistic_push_linear_search(nparents: usize, nsamples: usize) {
         }
     }
     rv.sort_unstable();
+    rv
 }
 
-pub fn realistic_hashset_nohash(nparents: usize, nsamples: usize) {
+pub fn realistic_hashset_nohash(
+    nparents: usize,
+    nsamples: usize,
+) -> HashSet<usize, BuildNoHashHasher<usize>> {
     let mut rng = StdRng::from_entropy();
     let u = rand::distributions::Uniform::<usize>::new(0, nparents);
     let mut h: std::collections::HashSet<usize, BuildNoHashHasher<usize>> =
@@ -182,6 +200,7 @@ pub fn realistic_hashset_nohash(nparents: usize, nsamples: usize) {
     for _ in 0..nsamples {
         h.insert(rng.sample(u));
     }
+    h
 }
 
 #[test]

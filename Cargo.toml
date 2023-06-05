@@ -15,5 +15,13 @@ name = "vec"
 harness = false
 
 [[bench]]
+name = "vec_lookup"
+harness = false
+
+[[bench]]
 name = "hash"
+harness = false
+
+[[bench]]
+name = "hash_lookup"
 harness = false
